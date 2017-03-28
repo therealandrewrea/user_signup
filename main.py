@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,16 @@ import webapp2
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        header = "<h1>User Signup</h1>"
+        user_req = "<label>   Username</label>"
+        pwd_req = "<label>    Password</label>"
+        pwd_req2 = "<label>Verify Password</label>"
+        email_req = "<label>Email(optional)</label>"
+        content = '''<form method="post">''' + user_req + "<br>" + pwd_req + "<br>" + pwd_req2 + "<br>" + email_req + '''</form>'''
+
+        self.response.write(header + content) #for initial load of page, reloads and error messages after a post
+
+    #def post(self): #for updating of data from post request
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
