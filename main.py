@@ -19,11 +19,12 @@ import webapp2
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         header = "<h1>User Signup</h1>"
-        user_req = "<label>   Username</label>"
-        pwd_req = "<label>    Password</label>"
-        pwd_req2 = "<label>Verify Password</label>"
-        email_req = "<label>Email(optional)</label>"
-        content = '''<form method="post">''' + user_req + "<br>" + pwd_req + "<br>" + pwd_req2 + "<br>" + email_req + '''</form>'''
+        user_req = "<label>   Username</label><input type='text' name='username'>"
+        pwd_req = "<label>    Password</label><input type='text' name='password1'>"
+        pwd_req2 = "<label>Verify Password</label><input type='text' name='password2'>"
+        email_req = "<label>Email(optional)</label><input type='text' name='email'>"
+        submit_button = "<input type='submit' name='submit'>"
+        content = '''<form method="post">''' + user_req + "<br>" + pwd_req + "<br>" + pwd_req2 + "<br>" + email_req + "<br>" + submit_button + '''</form>'''
 
         self.response.write(header + content) #for initial load of page, reloads and error messages after a post
 
