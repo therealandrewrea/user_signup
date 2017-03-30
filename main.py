@@ -24,11 +24,34 @@ class MainHandler(webapp2.RequestHandler):
         pwd_req2 = "<label>Verify Password</label><input type='text' name='password2'>"
         email_req = "<label>Email(optional)</label><input type='text' name='email'>"
         submit_button = "<input type='submit' name='submit'>"
-        content = '''<form method="post">''' + user_req + "<br>" + pwd_req + "<br>" + pwd_req2 + "<br>" + email_req + "<br>" + submit_button + '''</form>'''
+        user_error = ""
+        pwd1_error = ""
+        pwd2_error = ""
+        email_error = ""
+        content = '''<form method="post">''' + user_req + user_error + "<br>" + pwd_req + pwd1_error + "<br>" + pwd_req2 + pwd2_error + "<br>" + email_req + email_error + "<br>" + submit_button + '''</form>'''
+            #within the content line, insert relevant errors (user_req + user_error), (pwd_req + pwd1_error), (pwd_req2 + pwd2_error), (email_req + email_error)
+
+    #error = self.request.get("error")
+        #if error:
+            #error_esc = cgi.escape(error, quote=True)
+            #error_element = '<p class="error">' + error_esc + '</p>'
+        #else:
+            #error_element = ''
 
         self.response.write(header + content) #for initial load of page, reloads and error messages after a post
 
-    #def post(self): #for updating of data from post request
+    def post(self): #for updating of data from post request
+        username = self.request.get("username")
+        password1 = self.request.get("password1")
+        password2 = self.request.get("password2")
+        email = self.request.get("email")
+
+        #if any errors, identify and create error message
+
+
+        #if all checks clear, print this content
+        content = "<h1>Welcome, {0}!".format(username)
+        self.response.write(content)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
