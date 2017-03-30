@@ -16,6 +16,13 @@
 #
 import webapp2
 
+#CSS for Red Error Messages - apply inline as class
+#<style type="text/css">
+    #.error {
+        #color: red;
+    #}
+#</style>
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         header = "<h1>User Signup</h1>"
@@ -47,7 +54,12 @@ class MainHandler(webapp2.RequestHandler):
         email = self.request.get("email")
 
         #if any errors, identify and create error message
-
+        user_error = "That's not a valid username."
+        pwd_error = "That wasn't a valid password."
+        pwd_error2 = "Your passwords don't match."
+        email_error = "That's not a valid email."
+        #self.redirect("/?error=" + error)
+        #redirect to original page with errors included
 
         #if all checks clear, print this content
         content = "<h1>Welcome, {0}!".format(username)
