@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 import webapp2
+import re
 
 #CSS for Red Error Messages - apply inline as class
 #<style type="text/css">
@@ -53,7 +54,17 @@ class MainHandler(webapp2.RequestHandler):
         password2 = self.request.get("password2")
         email = self.request.get("email")
 
+        valid_user = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+        valid_pass = re.compile(r"^.{3,20}$")
+        valid_email = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+
+        very_valid_user = valid_user.match(username)
+        very_valid_pass = valid_pass.match(password1)
+        very_valid_email = valid_email.match(email)
+
+        #if password1 != password2 #check if passwords match, return pwd_error2 if they don't
         #if any errors, identify and create error message
+
         user_error = "That's not a valid username."
         pwd_error = "That wasn't a valid password."
         pwd_error2 = "Your passwords don't match."
