@@ -63,7 +63,7 @@ class MainHandler(webapp2.RequestHandler):
         def valid_username(username):
             return username and user_re.match(username)
         def valid_password(password1):
-            return password and pass_re.match(password1)
+            return password1 and pass_re.match(password1)
         def valid_email(email):
             return not email or email_re.match(email)
 
@@ -79,7 +79,7 @@ class MainHandler(webapp2.RequestHandler):
             params['email_error'] = "That's not a valid email."
             have_error = True
 
-        if not valid_password(password):
+        if not valid_password(password1):
             params['pwd_error'] = "That wasn't a valid password."
             have_error = True
         elif password2 != password1:
@@ -87,7 +87,7 @@ class MainHandler(webapp2.RequestHandler):
 
         content = "<h1>Welcome, {0}!".format(username)
         if have_error:
-            self.redirect("/?=" + user_error + pwd_error + pwd_error2 + email_error)
+            self.response.write("You've got errors up in your shit, son")
         else:
             self.response.write(content)
 
