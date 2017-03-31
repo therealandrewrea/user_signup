@@ -27,10 +27,10 @@ import re
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         header = "<h1>User Signup</h1>"
-        user_req = "<label>   Username</label><input type='text' name='username'>"
-        pwd_req = "<label>    Password</label><input type='text' name='password1'>"
-        pwd_req2 = "<label>Verify Password</label><input type='text' name='password2'>"
-        email_req = "<label>Email(optional)</label><input type='text' name='email'>"
+        user_req = "<label>   Username</label><input type='text' name='username' value=''>"
+        pwd_req = "<label>    Password</label><input type='password' name='password1' value=''>"
+        pwd_req2 = "<label>Verify Password</label><input type='password' name='password2' value=''>"
+        email_req = "<label>Email(optional)</label><input type='text' name='email' value=''>"
         submit_button = "<input type='submit' name='submit'>"
         user_error = ""
         pwd1_error = ""
@@ -49,32 +49,47 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(header + content) #for initial load of page, reloads and error messages after a post
 
     def post(self): #for updating of data from post request
+        have_error = False #initialize to false, this tells us if any errors are detected, if not - success!  If so, pass them along
         username = self.request.get("username")
         password1 = self.request.get("password1")
         password2 = self.request.get("password2")
         email = self.request.get("email")
 
-        valid_user = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-        valid_pass = re.compile(r"^.{3,20}$")
-        valid_email = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+        #regular expressions for verifying inputs
+        user_re = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+        pass_re = re.compile(r"^.{3,20}$")
+        email_re = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
-        very_valid_user = valid_user.match(username)
-        very_valid_pass = valid_pass.match(password1)
-        very_valid_email = valid_email.match(email)
+        def valid_username(username):
+            return username and user_re.match(username)
+        def valid_password(password1):
+            return password and pass_re.match(password1)
+        def valid_email(email):
+            return not email or email_re.match(email)
 
-        #if password1 != password2 #check if passwords match, return pwd_error2 if they don't
-        #if any errors, identify and create error message
+        #build dictionary to track params and adjust have_error variable if one exists
+        params = dict(username = username,
+                    email = email)
 
-        user_error = "That's not a valid username."
-        pwd_error = "That wasn't a valid password."
-        pwd_error2 = "Your passwords don't match."
-        email_error = "That's not a valid email."
-        #self.redirect("/?error=" + error)
-        #redirect to original page with errors included
+        if not valid_username(username):
+            params['user_error'] = "That's not a valid username."
+            have_error = True
 
-        #if all checks clear, print this content
+        if not valid_email(email):
+            params['email_error'] = "That's not a valid email."
+            have_error = True
+
+        if not valid_password(password):
+            params['pwd_error'] = "That wasn't a valid password."
+            have_error = True
+        elif password2 != password1:
+            params['pwd_error2'] = "Your passwords don't match."
+
         content = "<h1>Welcome, {0}!".format(username)
-        self.response.write(content)
+        if have_error:
+            self.redirect("/?=" + user_error + pwd_error + pwd_error2 + email_error)
+        else:
+            self.response.write(content)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)
