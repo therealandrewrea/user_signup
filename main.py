@@ -87,7 +87,7 @@ class MainHandler(webapp2.RequestHandler):
 
         content = "<h1>Welcome, {0}!".format(username)
         if have_error:
-            self.response.write("You've got errors up in your shit, son")
+            self.response.write("You've got errors up in your shit, son") #placeholder, displays snarky message when have_error is True
         else:
             self.response.write(content)
 
