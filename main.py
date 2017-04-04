@@ -69,12 +69,12 @@ def write_form(username, email, user_error, pwd1_error, pwd2_error, email_error)
         </tr>
         <tr>
         <td><label>Password</label></td>
-        <td><input name='password' type='password' required/></td>
+        <td><input name='password1' type='password' required/></td>
         <td><span class='error'>'''+pwd1_error+'''</span></td>
         </tr>
         <tr>
         <td><label>Verify Password</label></td>
-        <td><input name='verify' type='password' required/></td>
+        <td><input name='password2' type='password' required/></td>
         <td><span class='error'>'''+pwd2_error+'''</span></td>
         </tr>
         <tr>
@@ -105,7 +105,7 @@ class MainHandler(webapp2.RequestHandler):
         password2 = self.request.get("password2")
         email = self.request.get("email")
 
-        have_error = False
+        errors = False
         user_error = ""
         pwd1_error = ""
         pwd2_error = ""
