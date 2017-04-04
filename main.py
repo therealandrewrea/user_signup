@@ -18,19 +18,84 @@ import webapp2
 import re
 
 #CSS for Red Error Messages - apply inline as class
+page_header = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Signup</title>
+    <style type="text/css">
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+'''
+
+page_footer = '''
+</body>
+</html>
+'''
+
+USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+def valid_username(username):
+    return username and USER_RE.match(username)
+
+PASS_RE = re.compile(r"^.{3,20}$")
+def valid_password(password):
+    return password and PASS_RE.match(password)
+
+EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
+def valid_email(email):
+    return email and EMAIL_RE.match(email)
+
+error_messages = ["That's not a valid username",
+"That's not a valid password",
+"Passwords don't match",
+"That's not a valid email"
+]
+
 
 def write_form(username, email, user_error, pwd1_error, pwd2_error, email_error):
-    header = "<h1>User Signup</h1>"
-    user_req = "<label>   Username</label><input type='text' name='username' value=''>"
-    pwd_req = "<label>    Password</label><input type='password' name='password1' value=''>"
-    pwd_req2 = "<label>Verify Password</label><input type='password' name='password2' value=''>"
-    email_req = "<label>Email(optional)</label><input type='text' name='email' value=''>"
-    submit_button = "<input type='submit' name='submit'>"
-    form = header + '''<form method="post">''' + user_req + user_error + "<br>" + pwd_req + pwd1_error + "<br>" + pwd_req2 + pwd2_error + "<br>" + email_req + email_error + "<br>" + submit_button + '''</form>'''
-    return form
+    signup_header = "<h1>Signup</h1>"
+
+    signup_form = '''
+    <form method='post'>
+    <table>
+        <tr>
+        <td><label>Username</label></td>
+        <td><input name='username' type='text' value="'''+username+'''" required/></td>
+        <td><span class='error'>'''+user_error+'''</span></td>
+        </tr>
+        <tr>
+        <td><label>Password</label></td>
+        <td><input name='password' type='password' required/></td>
+        <td><span class='error'>'''+pwd1_error+'''</span></td>
+        </tr>
+        <tr>
+        <td><label>Verify Password</label></td>
+        <td><input name='verify' type='password' required/></td>
+        <td><span class='error'>'''+pwd2_error+'''</span></td>
+        </tr>
+        <tr>
+        <td><label>Email (optional)</label></td>
+        <td><input name='email' type='email' value="'''+email+'''"/></td>
+        <td><span class='error'>'''+email_error+'''</span></td>
+        </tr>
+    </table>
+    <input type='submit'>
+    '''
+
+    return page_header + signup_header + signup_form + page_footer
+
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+        user_error = ""
+        pwd1_error = ""
+        pwd2_error = ""
+        email_error = ""
+
         blank = write_form("","","","","","")
         self.response.write(blank)    #within the content line, insert relevant errors (user_req + user_error), (pwd_req + pwd1_error), (pwd_req2 + pwd2_error), (email_req + email_error)
 
@@ -46,39 +111,37 @@ class MainHandler(webapp2.RequestHandler):
         pwd2_error = ""
         email_error = ""
         #regular expressions for verifying inputs
-        user_re = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-        pass_re = re.compile(r"^.{3,20}$")
-        email_re = re.compile(r"^[\S]+@[\S]+.[\S]+$")
-
-        def valid_username(username):
-            return username and user_re.match(username)
-        def valid_password(password1):
-            return password1 and pass_re.match(password1)
-        def valid_email(email):
-            return not email or email_re.match(email)
-
         if not valid_username(username):
-            user_error += "That's not a valid username."
-            have_error = True
-        if not valid_email(email):
-            email_error += "That's not a valid email."
-            have_error = True
+            user_error += error_messages[0]
+            errors = True
+
         if not valid_password(password1):
-            pwd1_error += "That wasn't a valid password."
-            have_error = True
-        if password2 != password1:
-            pwd2_error += "Your passwords don't match."
-            have_error = True
+            pwd1_error += error_messages[1]
+            errors = True
 
-        content = "<h1>Welcome, {0}!".format(username)
+        if password1 != password2:
+            pwd2_error += error_messages[2]
+            errors = True
 
-        if have_error == True:
-            error_page = write_form(username, email, user_error, pwd1_error, pwd2_error, email_error)
-            self.response.write(error_page) #placeholder, displays snarky message when have_error is True
-        elif have_error == False:
-            self.response.write(content)
+        if len(email) > 0:
+            if not valid_email(email):
+                email_error += error_messages[3]
+                errors = True
 
+        if errors == False:
+            self.redirect('/welcome?username=' + username)
+        if errors == True:
+            error_codes = write_form(username,email,user_error,pwd1_error,pwd2_error,email_error)
+            self.response.write(error_codes)
+
+class Welcome(webapp2.RequestHandler):
+    def get(self):
+        username = self.request.get('username')
+        greeting = "Welcome, " + username + "!"
+        content = page_header + "<h1>"+greeting+"</h1>" + page_footer
+        self.response.write(content)
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/welcome', Welcome)
 ], debug=True)
